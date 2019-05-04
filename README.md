@@ -1,7 +1,8 @@
 # synology
 Synology personnal hack, info, tools &amp; source code
 
-Currently only contains patches to get hauppauge WinTV functional.
+Synology 6.2.2:
+Currently only contains patches & modules to get hauppauge WinTV functional.
 
 Working:
 - em28xx: 1st tuner detected & loading firmware ok
