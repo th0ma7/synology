@@ -32,6 +32,7 @@ Available patches makes both tuner detected by the kernel using the em28xx.ko up
 
 Working:
 - em28xx: both tuners detected & firmware loading OK
+
 Not working:
 - lgdt3306a: crash
 
@@ -65,8 +66,10 @@ Kernel messages:
 [  114.500420] em28xx: Registered (Em28xx dvb Extension) extension
 ```
 Work is based on the backporting of the following upstream kernel patches:
+
 Demodulator (lgdt3306a):
 * https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=4f75189024f4186a7ff9d56f4a8cb690774412ec
+
 Adaptor (em28xx):
 * https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=11a2a949d05e9d2d9823f0c45fa476743d9e462b
 * https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=1586342e428d80e53f9a926b2e238d2175b9f5b5
@@ -77,6 +80,7 @@ Using a Ubuntu 18.04 OS VM in order to build the updated modules.
 
 Install a few essential packages:
 ```
+$ sudo apt update
 $ sudo apt install build-essential ncurses-dev bc libssl-dev libc6-i386 curl
 ```
 
