@@ -66,7 +66,7 @@ $ mkdir $HOME/sources
 
 Download the toolchain from Home / DSM 6.2 Tool Chains / Intel x86 Linux 4.4.59 (Apollolake)
 ```
-$ https://sourceforge.net/projects/dsgpl/files/DSM%206.2%20Tool%20Chains/Intel%20x86%20Linux%204.4.59%20%28Apollolake%29/apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz/download -O apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz -P $HOME/synology
+$ wget https://sourceforge.net/projects/dsgpl/files/DSM%206.2%20Tool%20Chains/Intel%20x86%20Linux%204.4.59%20%28Apollolake%29/apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz/download -O apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz -P $HOME/synology
 ```
 
 Download the synology kernel sources from Home / Synology NAS GPL Source / 22259branch / apollolake-source:
