@@ -84,3 +84,68 @@ $ sudo apt update
 $ sudo apt install build-essential ncurses-dev bc libssl-dev libc6-i386 curl
 ```
 
+The toolchain & kernel sources are located here:
+https://sourceforge.net/projects/dsgpl/files/
+
+I use a $HOME/synology directory to drop all the downloaded files and a $HOME/source as my working directory.  Later references make usage of theses both paths:
+```
+$ mkdir $HOME/synology
+$ mkdir $HOME/sources
+```
+
+Download the toolchain from Home / DSM 6.2 Tool Chains / Intel x86 Linux 4.4.59 (Apollolake)
+```
+$ https://sourceforge.net/projects/dsgpl/files/DSM%206.2%20Tool%20Chains/Intel%20x86%20Linux%204.4.59%20%28Apollolake%29/apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz/download -O apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz -P $HOME/synology
+```
+
+Download the synology kernel sources from Home / Synology NAS GPL Source / 22259branch / apollolake-source:
+```
+$ wget https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/apollolake-source/linux-4.4.x.txz/download -O linux-4.4.x.txz -P $HOME/synology
+```
+
+Extract the files:
+* The toolset is decompressed into the $HOME/synology directory
+* Kernel sources are decompresed in the $HOME/sources directory
+```
+$ tar -xvf $HOME/synology/apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz -C $HOME/synology
+$ tar -xvf $HOME/synology/linux-4.4.x.txz -C $HOME/sources
+```
+
+Download the em28xx patches:
+```
+$ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/002-Hauppauge955D-em28xx-Tuner1.patch -P $HOME/sources
+$ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/003-Hauppauge955D-em28xx-Tuner2-v6.patch -P $HOME/sources
+```
+
+## Patching
+We now have to prepare the kernel sources for compilation.  Move down to the $HOME/sources directory:
+```
+$ cd $HOME/sources/linux-4.4.x
+```
+
+Frist need to copy the apollolake synology kernel configuration
+```
+~/sources/linux-4.4.x$ synoconfigs/apollolake .config
+```
+
+Secondly, using a text editor you need to adjust a few variables in the Makefile such as:
+```
+EXTRAVERSION = +
+ARCH            ?= x86_64
+CROSS_COMPILE   ?= /usr/local/x86_64-pc-linux-gnu/bin/x86_64-pc-linux-gnu-
+```
+
+Lastly, apply the necessary patches:
+```
+~/sources/linux-4.4.x$ patch -p1 < ../002-Hauppauge955D-em28xx-Tuner1.patch
+~/sources/linux-4.4.x$ patch -p1 < ../003-Hauppauge955D-em28xx-Tuner2-v6.patch
+```
+
+# Compilation
+We should now all set for building the modules:
+```
+~/sources/linux-4.4.x$ sudo make oldconfig
+~/sources/linux-4.4.x$ make modules_prepare
+~/sources/linux-4.4.x$ make modules M=drivers/media/dvb-frontends -j4
+~/sources/linux-4.4.x$ make modules M=drivers/media/usb/em28xx
+```
