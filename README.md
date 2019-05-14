@@ -119,15 +119,14 @@ Modify the original configuration:
 ~/sources/linux-4.4.x$ sudo make oldconfig
 ~/sources/linux-4.4.x$ sudo make menuconfig
     Device Drivers  --->
-<M> Multimedia support  --->
-[*]   Media Controller API
-[*]   V4L2 sub-device userspace API
+    <M> Multimedia support  --->
+        [*]   Media Controller API
+        [*]   V4L2 sub-device userspace API
 ```
 Everything should now all set for building the modules:
 ```
 ~/sources/linux-4.4.x$ make modules_prepare
-~/sources/linux-4.4.x$ make modules M=drivers/media/dvb-frontends -j4
-~/sources/linux-4.4.x$ make modules M=drivers/media/usb/em28xx
+~/sources/linux-4.4.x$ make modules M=drivers/media -j4
 ```
 
 # Installation
@@ -151,7 +150,6 @@ $ sudo scp "username@192.168.x.x:~/sources/linux-4.4.x/drivers/media/dvb-fronten
 ```
 
 Create a local rc file locate at /usr/local/etc/rc.d/hauppauge.sh that will be executed at boot time:
-* Note that lgdt3306a.ko is currently commented as the module crash (needs fixing)
 ```
 #!/bin/sh
 
