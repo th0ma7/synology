@@ -162,11 +162,11 @@ sudo insmod /lib/modules/v4l2-common.ko
 sudo insmod /lib/modules/tveeprom.ko
 
 # Load Hauppauge updated drivers
+sudo insmod /lib/modules/si2157.ko
+sudo insmod /usr/local/lib/modules/$(uname -r)/media.ko
+sudo insmod /usr/local/lib/modules/$(uname -r)/lgdt3306a.ko
 sudo insmod /usr/local/lib/modules/$(uname -r)/em28xx.ko
 sudo insmod /usr/local/lib/modules/$(uname -r)/em28xx-dvb.ko
-sudo insmod /usr/local/lib/modules/$(uname -r)/lgdt3306a.ko
-sudo insmod /usr/local/lib/modules/$(uname -r)/media.ko
-sudo insmod /lib/modules/si2157.ko
 ```
 
 Execute manually the rc script to confirm all is ok:
