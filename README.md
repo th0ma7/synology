@@ -83,6 +83,7 @@ $ tar -xvf $HOME/synology/linux-4.4.x.txz -C $HOME/sources
 
 Download the em28xx patches:
 ```
+$ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/001-Hauppauge955D-lgdt3306a-v3.patch -P $HOME/sources
 $ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/002-Hauppauge955D-em28xx-Tuner1.patch -P $HOME/sources
 $ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/003-Hauppauge955D-em28xx-Tuner2-v6.patch -P $HOME/sources
 ```
@@ -107,14 +108,23 @@ CROSS_COMPILE   ?= /usr/local/x86_64-pc-linux-gnu/bin/x86_64-pc-linux-gnu-
 
 Lastly, apply the necessary patches:
 ```
+~/sources/linux-4.4.x$ patch -p1 < ../001-Hauppauge955D-lgdt3306a-v3.patch
 ~/sources/linux-4.4.x$ patch -p1 < ../002-Hauppauge955D-em28xx-Tuner1.patch
 ~/sources/linux-4.4.x$ patch -p1 < ../003-Hauppauge955D-em28xx-Tuner2-v6.patch
 ```
 
 # Compilation
-Everything should now all set for building the modules:
+Modify the original configuration:
 ```
 ~/sources/linux-4.4.x$ sudo make oldconfig
+~/sources/linux-4.4.x$ sudo make menuconfig
+    Device Drivers  --->
+<M> Multimedia support  --->
+[*]   Media Controller API
+[*]   V4L2 sub-device userspace API
+```
+Everything should now all set for building the modules:
+```
 ~/sources/linux-4.4.x$ make modules_prepare
 ~/sources/linux-4.4.x$ make modules M=drivers/media/dvb-frontends -j4
 ~/sources/linux-4.4.x$ make modules M=drivers/media/usb/em28xx
