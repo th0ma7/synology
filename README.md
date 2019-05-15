@@ -28,12 +28,13 @@ model name	: Intel(R) Celeron(R) CPU J3455 @ 1.50GHz
 ```
 
 ## Current status
-Available patches makes both tuner detected by the kernel using the em28xx.ko updated driver.  The lgdt3306 demodulator driver providing the dvb-frontend devices now works and has a few DEBUG messages output.  It originally failed because I was also sharing the USB device with a Ubuntu VM running on-top.
+Available patches makes both tuner detected by the kernel using the `em28xx.ko` updated driver.  The `lgdt3306a.ko` demodulator driver providing the dvb-frontend devices now works and has a few DEBUG messages output.  It originally failed because I was also sharing the USB device with a Ubuntu VM running on-top and loading the kernel modules in the wrong order.
 
 Working:
-- em28xx: both tuners detected & firmware loading OK
-- lgdt3306a: now functional (as long as you don't try sharing the device with a VM ;)
-- tvheadend: fully detects both tuners (as long as you don't run video station as well)
+- `em28xx`: both tuners detected & firmware loading OK
+- `lgdt3306a`: now functional
+End result:
+- `tvheadend`: fully detects both tuners
 
 Work is based on the backporting of the following upstream kernel patches:
 
@@ -44,6 +45,9 @@ Adaptor (em28xx):
 * https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=11a2a949d05e9d2d9823f0c45fa476743d9e462b
 * https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=1586342e428d80e53f9a926b2e238d2175b9f5b5
 * https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=be7fd3c3a8c5e9acbc69f887ca961df5e68cf6f0
+
+Along with backported patches from the media-tree that b-rad-NDi made available here:
+* https://github.com/b-rad-NDi/Ubuntu-media-tree-kernel-builder/tree/master/patches/fedora-22-4.4.0
 
 ## Preparation
 Using a Ubuntu 18.04 OS VM in order to build the updated modules.
@@ -74,14 +78,14 @@ $ wget https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Sourc
 ```
 
 Extract the files:
-* The toolset is decompressed into the $HOME/synology directory
-* Kernel sources are decompresed in the $HOME/sources directory
+* The toolset is decompressed into the `$HOME/synology` directory
+* Kernel sources are decompresed in the `$HOME/sources` directory
 ```
 $ tar -xvf $HOME/synology/apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz -C $HOME/synology
 $ tar -xvf $HOME/synology/linux-4.4.x.txz -C $HOME/sources
 ```
 
-Download the em28xx patches:
+Download the `lgdt3306a` and `em28xx` patches:
 ```
 $ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/001-Hauppauge955D-lgdt3306a-v3.patch -P $HOME/sources
 $ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/002-Hauppauge955D-em28xx-Tuner1.patch -P $HOME/sources
@@ -89,7 +93,7 @@ $ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/003-Ha
 ```
 
 ## Patching
-We now have to prepare the kernel sources for compilation.  Move down to the $HOME/sources directory:
+We now have to prepare the kernel sources for compilation.  Move down to the `$HOME/sources` directory:
 ```
 $ cd $HOME/sources/linux-4.4.x
 ```
@@ -142,14 +146,21 @@ $ sudo mkdir -p /usr/local/lib/modules/$(uname -r)
 $ cd /usr/local/lib/modules/$(uname -r)
 ```
 
-Copy the files over to the NAS:
+Copy the updated media drivers modules over to the NAS:
 ```
 $ sudo scp "username@192.168.x.x:~/sources/linux-4.4.x/drivers/media/usb/em28xx/*.ko" .
 $ sudo scp "username@192.168.x.x:~/sources/linux-4.4.x/drivers/media/dvb-frontends/lgdt3306a.ko" .
 $ sudo scp "username@192.168.x.x:~/sources/linux-4.4.x/drivers/media/dvb-frontends/media.ko" .
 ```
 
-Create a local rc file locate at /usr/local/etc/rc.d/hauppauge.sh that will be executed at boot time:
+Copy the load/unload script to the NAS as well (and make it executable):
+```
+$ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/hauppauge-load.sh
+$ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/hauppauge-unload.sh
+$ chmod 755 hauppauge-*.sh
+```
+
+Create a local rc file locate at `/usr/local/etc/rc.d/hauppauge.sh` that will be executed at boot time (or copy `hauppauge-load.sh` script):
 ```
 #!/bin/sh
 
@@ -174,7 +185,7 @@ Execute manually the rc script to confirm all is ok:
 $ sudo /usr/local/etc/rc.d/hauppauge.sh
 ```
 
-Normally should see the following in kernel dmesg (added a few DEBUG to lgdt3306a):
+Normally should see the following in kernel `dmesg` (added a few DEBUG to lgdt3306a):
 ```
 [  557.806644] em28xx: New device HCW 955D @ 480 Mbps (2040:026d, interface 0, class 0)
 [  557.815308] em28xx: DVB interface 0 found: isoc
