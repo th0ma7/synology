@@ -1,7 +1,7 @@
 #!/bin/sh
 
 SERVICE="pkgctl-tvheadend"
-MODULES="em28xx-dvb em28xx lgdt3306a media si2157 tveeprom v4l2-common videodev dvb-usb rc-core dvb-core"
+MODULES="em28xx_dvb em28xx lgdt3306a media si2157 tveeprom v4l2_common videodev dvb-usb rc-core dvb-core"
 
 GetServiceStatus() {
    case $(sudo synoservice --status $SERVICE | grep "\[$SERVICE\].*start") in
