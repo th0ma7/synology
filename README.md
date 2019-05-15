@@ -260,3 +260,5 @@ $ lsusb -Ic
 ```
 
 Now reboot the NAS using the admin web page and confirm after reboot that the dmesg output and lsusb are still ok.
+
+In case you run into issue where your NAS refuses to fully shutdown (and thus reboot) with the power button led blinking, it is most probably due to tainted modules still in memory.  Using the hauppauge-unload.sh script prior to shutdown/reboot will remove all the tainted modules from memory thus allowing the NAS to properly shutdown/reboot.
