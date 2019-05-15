@@ -146,7 +146,7 @@ $ sudo mkdir -p /usr/local/lib/modules/$(uname -r)
 $ cd /usr/local/lib/modules/$(uname -r)
 ```
 
-Copy the updated media drivers modules over to the NAS:
+Copy the updated media drivers modules over to the NAS (or download the one from my repository on github - Use at your own risks):
 ```
 $ sudo scp "username@192.168.x.x:~/sources/linux-4.4.x/drivers/media/usb/em28xx/*.ko" .
 $ sudo scp "username@192.168.x.x:~/sources/linux-4.4.x/drivers/media/dvb-frontends/lgdt3306a.ko" .
