@@ -41,7 +41,7 @@ USBAutoSuspend() {
             printf '[%5s] -> OK\n' "$current"
          else
 	        [ "$1" = "check" ] || echo ${AUTOSUSPEND_VALUE[$index]} | sudo tee $sys 1>/dev/null
-            printf '[%5s] -> [%4s]\n' "$current" "$new"
+            printf '[%5s] -> [%5s]\n' "$current" "$new"
          fi
      done
    fi
@@ -54,14 +54,14 @@ Sysctl() {
       declare -i current=$(sysctl -n ${SYSCTL_VAR[$index]})
       declare -i new=${SYSCTL_VALUE[$index]}
 
- 	 printf '\t%-30s' ${SYSCTL_VAR[$index]}
-     if [ $current -eq $new ]; then
-        printf '[%5s] -> OK\n' "$current"
-     else
-	    [ "$1" = "check" ] || sysctl -w ${SYSCTL_VAR[$index]}=$new 2>/dev/null
-        printf '[%5s] -> [%4s]\n' "$current" "$new"
-     fi
-  done
+      printf '\t%-30s' ${SYSCTL_VAR[$index]}
+      if [ $current -eq $new ]; then
+         printf '[%5s] -> OK\n' "$current"
+      else
+	     [ "$1" = "check" ] || sysctl -w ${SYSCTL_VAR[$index]}=$new 2>/dev/null 1>&2
+         printf '[%5s] -> [%5s]\n' "$current" "$new"
+      fi
+   done
 }
 
 ModuleLOAD() {
