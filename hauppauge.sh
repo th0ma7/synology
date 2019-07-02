@@ -40,7 +40,7 @@ USBAutoSuspend() {
          if [ $current -eq $new ]; then
             printf '[%5s] -> OK\n' "$current"
          else
-	        [ "$1" = "check" ] || echo ${AUTOSUSPEND_VAR[$index]} | sudo tee $var 1>/dev/null
+	        [ "$1" = "check" ] || echo ${AUTOSUSPEND_VALUE[$index]} | sudo tee $sys 1>/dev/null
             printf '[%5s] -> [%4s]\n' "$current" "$new"
          fi
      done
@@ -151,11 +151,11 @@ ServiceSTART() {
    echo "OK"
    elif [ "$status" = "start" ]; then
       # Check if sevice isn't already started!
-      if [ pidof tvheadend ]; then
-         echo "Already started!"
+      if [ "$(pidof tvheadend)" ]; then
+         echo "Started"
       else
-         synoservice --restart $SERVICE
-      echo "Restart"
+         synoservice --restart $SERVICE 2>/dev/null 1>&2
+         echo "Restart"
       fi
    else
       echo "N/A"
