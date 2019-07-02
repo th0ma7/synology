@@ -35,12 +35,12 @@ USBAutoSuspend() {
          declare -i current=$(cat $sys)
          declare -i new=${AUTOSUSPEND_VALUE[$index]}
 
- 	     printf '\t(%s)%-25s' $usbID ${AUTOSUSPEND_VAR[$index]}
+         printf '\t(%s)%-25s' $usbID ${AUTOSUSPEND_VAR[$index]}
 
          if [ $current -eq $new ]; then
             printf '[%5s] -> OK\n' "$current"
          else
-	        [ "$1" = "check" ] || echo ${AUTOSUSPEND_VALUE[$index]} | sudo tee $sys 1>/dev/null
+            [ "$1" = "check" ] || echo ${AUTOSUSPEND_VALUE[$index]} | sudo tee $sys 1>/dev/null
             printf '[%5s] -> [%5s]\n' "$current" "$new"
          fi
      done
@@ -58,7 +58,7 @@ Sysctl() {
       if [ $current -eq $new ]; then
          printf '[%5s] -> OK\n' "$current"
       else
-	     [ "$1" = "check" ] || sysctl -w ${SYSCTL_VAR[$index]}=$new 2>/dev/null 1>&2
+         [ "$1" = "check" ] || sysctl -w ${SYSCTL_VAR[$index]}=$new 2>/dev/null 1>&2
          printf '[%5s] -> [%5s]\n' "$current" "$new"
       fi
    done
@@ -68,15 +68,15 @@ ModuleLOAD() {
    echo "Loading kernel modules... "
    for item in $MODULES; do echo $item; done | tac | while read module
    do
-	  module_load=$(echo "${module}.ko" | sed 's/_/-/g')
+      module_load=$(echo "${module}.ko" | sed 's/_/-/g')
       printf '\t%-30s' $module_load
-	  status=$(lsmod | grep "^$module ")
+      status=$(lsmod | grep "^$module ")
 
-	  if [ $? -eq 0 -a "status" ]; then
-		 echo "Loaded"
+      if [ $? -eq 0 -a "status" ]; then
+         echo "Loaded"
       else
          insmod $MODULE_PATH/$module_load
-	     [ $? -eq 0 ] && echo "OK" || echo "ERROR"
+         [ $? -eq 0 ] && echo "OK" || echo "ERROR"
       fi
    done
 }
@@ -91,9 +91,9 @@ ModuleUNLOAD() {
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
          rmmod $module
-	     echo -ne "OK\n"
+         echo -ne "OK\n"
       else
-	     echo -ne "N/A\n"
+         echo -ne "N/A\n"
       fi
    done
 }
@@ -107,9 +107,9 @@ ModuleSTATUS() {
 
       status=$(lsmod | grep "^$module ")
       if [ $? -eq 0 -a "status" ]; then
-	     echo -ne "OK\n"
+         echo -ne "OK\n"
       else
-	     echo -ne "N/A\n"
+         echo -ne "N/A\n"
       fi
    done
 }
@@ -130,7 +130,8 @@ ServiceSTATUS() {
 
    case "$1" in
       "full" ) printf '%-38s' "Status $SERVICE..."
-			   echo $status,$running,$pid;;
+               echo $status,$running,$pid
+               ;;
            * ) echo $running;;
    esac
 }
@@ -143,7 +144,7 @@ ServiceSTART() {
    module=$(lsmod | grep "^$RESET ")
    if [ $? -ne 0 -a ! "module" ]; then
       echo "ERROR module $RESET not found!"
-	  return
+      return
    fi
 
    if [ "$status" = "stop" ]; then
@@ -191,35 +192,35 @@ case $1 in
            USBAutoSuspend
            Sysctl
            ServiceSTART
-		   ;;
+           ;;
     stop ) ServiceSTOP
-	       ModuleUNLOAD
-		   ;;
+           ModuleUNLOAD
+           ;;
   status ) ServiceSTATUS full
-	       ModuleSTATUS
+           ModuleSTATUS
            USBAutoSuspend check
            Sysctl check
-		   ;;
+           ;;
  restart ) ServiceSTOP
            ModuleUNLOAD
-		   sleep 1
-		   ModuleLOAD
+           sleep 1
+           ModuleLOAD
            USBAutoSuspend
            Sysctl
-		   ServiceSTART
-		   ;;
+           ServiceSTART
+           ;;
    reset ) ServiceSTOP
            ModuleRESET $RESET
            ServiceSTART
-		   ServiceSTATUS full
-		   ModuleSTATUS
-		   ;;
+           ServiceSTATUS full
+           ModuleSTATUS
+           ;;
     load ) ModuleLOAD
-		   USBAutoSuspend
-	       Sysctl
-	       ;;
+           USBAutoSuspend
+           Sysctl
+           ;;
        * ) Usage
-	       ;;
+           ;;
 esac
 
 exit 0
