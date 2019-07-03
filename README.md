@@ -86,7 +86,7 @@ $ cd build/SYNOAPOLLOLAKE/media_build
 build/SYNOAPOLLOLAKE/media_build$ ./build
 ```
 
-# Installation - NEEDS UPDATING...
+# Installation
 
 Using SSH login as admin on the synology NAS:
 ```
@@ -99,46 +99,32 @@ $ sudo mkdir -p /usr/local/lib/modules/$(uname -r)
 $ cd /usr/local/lib/modules/$(uname -r)
 ```
 
-Copy the updated media drivers modules over to the NAS (or download the one from my repository on github - Use at your own risks):
+Download the updated media drivers modules over to the NAS:
 ```
-$ sudo scp "username@192.168.x.x:~/sources/linux-4.4.x/drivers/media/usb/em28xx/*.ko" .
-$ sudo scp "username@192.168.x.x:~/sources/linux-4.4.x/drivers/media/dvb-frontends/lgdt3306a.ko" .
-$ sudo scp "username@192.168.x.x:~/sources/linux-4.4.x/drivers/media/dvb-frontends/media.ko" .
+$ cd /usr/local/lib/modules/$(uname -r)
+$ sudo scp "username@192.168.x.x:~/Embedded-MediaDrivers/build/SYNOAPOLLOLAKE/media_build/v4l/*.ko" .
 ```
 
-Copy the load/unload script to the NAS as well (and make it executable):
+Copy the start/stop/load/reset script to the NAS (and make it executable):
 ```
-$ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/hauppauge-load.sh
-$ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge/hauppauge-unload.sh
+$ cd /usr/local/lib/modules/$(uname -r)
+$ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge.sh
 $ chmod 755 hauppauge-*.sh
 ```
 
-Create a local rc file locate at `/usr/local/etc/rc.d/hauppauge.sh` that will be executed at boot time (or copy `hauppauge-load.sh` script):
+Create a local rc file locate at `/usr/local/etc/rc.d/media.sh` that will be executed at boot time:
 ```
 #!/bin/sh
 
-# Load mandatory modules
-sudo insmod /lib/modules/dvb-core.ko
-sudo insmod /lib/modules/rc-core.ko
-sudo insmod /lib/modules/dvb-usb.ko
-sudo insmod /lib/modules/videodev.ko
-sudo insmod /lib/modules/v4l2-common.ko
-sudo insmod /lib/modules/tveeprom.ko
-
-# Load Hauppauge updated drivers
-sudo insmod /lib/modules/si2157.ko
-sudo insmod /usr/local/lib/modules/$(uname -r)/media.ko
-sudo insmod /usr/local/lib/modules/$(uname -r)/lgdt3306a.ko
-sudo insmod /usr/local/lib/modules/$(uname -r)/em28xx.ko
-sudo insmod /usr/local/lib/modules/$(uname -r)/em28xx-dvb.ko
+/usr/local/lib/modules/$(uname -r)/hauppauge.sh load
 ```
 
 Execute manually the rc script to confirm all is ok:
 ```
-$ sudo /usr/local/etc/rc.d/hauppauge.sh
+$ sudo /usr/local/etc/rc.d/media.sh load
 ```
 
-Normally should see the following in kernel `dmesg` (added a few DEBUG to lgdt3306a):
+Normally should see something similar in kernel `dmesg`:
 ```
 [  557.806644] em28xx: New device HCW 955D @ 480 Mbps (2040:026d, interface 0, class 0)
 [  557.815308] em28xx: DVB interface 0 found: isoc
@@ -172,10 +158,6 @@ Normally should see the following in kernel `dmesg` (added a few DEBUG to lgdt33
 [  560.260220] em28xx: dvb ts2 set to isoc mode.
 [  560.465298] em28174 #0: Binding DVB extension
 [  560.476140] i2c i2c-8: Added multiplexed i2c bus 11
-[  560.481615] DEBUG: Passed lgdt3306a_probe 2351 
-[  560.486720] DEBUG: Passed lgdt3306a_probe 2353 
-[  560.491791] DEBUG: Passed lgdt3306a_probe 2355 
-[  560.496853] DEBUG: Passed lgdt3306a_probe 2357 
 [  560.501921] lgdt3306a 8-0059: LG Electronics LGDT3306A successfully identified
 [  560.509994] DEBUG: Passed lgdt3306a_probe 2360 
 [  560.517015] si2157 11-0060: Silicon Labs Si2147/2148/2157/2158 successfully attached
@@ -184,12 +166,7 @@ Normally should see the following in kernel `dmesg` (added a few DEBUG to lgdt33
 [  560.544142] em28174 #0: DVB extension successfully initialized
 [  560.550672] em28174 #1: Binding DVB extension
 [  560.560027] i2c i2c-10: Added multiplexed i2c bus 12
-[  560.565578] DEBUG: Passed lgdt3306a_probe 2351 
-[  560.570650] DEBUG: Passed lgdt3306a_probe 2353 
-[  560.575800] DEBUG: Passed lgdt3306a_probe 2355 
-[  560.580886] DEBUG: Passed lgdt3306a_probe 2357 
 [  560.585962] lgdt3306a 10-000e: LG Electronics LGDT3306A successfully identified
-[  560.594141] DEBUG: Passed lgdt3306a_probe 2360 
 [  560.601410] si2157 12-0062: Silicon Labs Si2147/2148/2157/2158 successfully attached
 [  560.610075] DVB: registering new adapter (em28174 #1)
 [  560.615721] usb 1-3: DVB: registering adapter 1 frontend 0 (LG Electronics LGDT3306A VSB/QAM Frontend)...
@@ -214,4 +191,4 @@ $ lsusb -Ic
 
 Now reboot the NAS using the admin web page and confirm after reboot that the dmesg output and lsusb are still ok.
 
-In case you run into issue where your NAS refuses to fully shutdown (and thus reboot) with the power button led blinking, it is most probably due to tainted modules still in memory.  Using the hauppauge-unload.sh script prior to shutdown/reboot will remove all the tainted modules from memory thus allowing the NAS to properly shutdown/reboot.
+In case you run into issue where your NAS refuses to fully shutdown (and thus reboot) with the power button led blinking, it is most probably due to tainted modules still in memory.  Running `hauppauge.sh stop` prior to shutdown/reboot will remove all the tainted modules from memory thus allowing the NAS to properly shutdown/reboot.
