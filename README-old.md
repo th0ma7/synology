@@ -7,7 +7,7 @@ Donnations welcomed at: `0x522d164549E68681dfaC850A2cabdb95686C1fEC`
 The following allows building kernel modules for the Hauppauge WinTV DualHD HWC 955D media adapter allowing to use TVheadend natively within the NAS.
 * https://www.linuxtv.org/wiki/index.php/Hauppauge_WinTV-HVR-955Q
 
-Tested on the following hardware:
+It was tested on the following hardware:
 * model: DS918+
 * OS: DSM 6.2.2 build #24922
 * kernel: 4.4.59+
@@ -28,13 +28,26 @@ model name	: Intel(R) Celeron(R) CPU J3455 @ 1.50GHz
 ```
 
 ## Current status
-I had backported patches to the Synology DSM 6.x 4.4 kernel but there where a few issues pending.  Since then b-rad-NDi ended-up providing a backporting tool that allows rebuilding the media tree over the Synology DSM 6.2 kernel.  This solution as been playing really nicely on my NAS over the last months.
+Available patches makes both tuner detected by the kernel using the `em28xx.ko` updated driver.  The `lgdt3306a.ko` demodulator driver providing the dvb-frontend devices now works and has a few DEBUG messages output.  It originally failed because I was also sharing the USB device with a Ubuntu VM running on-top and loading the kernel modules in the wrong order.
 
 Working:
 - `em28xx`: both tuners detected & firmware loading OK
-- `lgdt3306a`: fully functional
+- `lgdt3306a`: now functional
 End result:
 - `tvheadend`: fully detects both tuners
+
+Work is based on the backporting of the following upstream kernel patches:
+
+Demodulator (lgdt3306a):
+* https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=4f75189024f4186a7ff9d56f4a8cb690774412ec
+
+Adaptor (em28xx):
+* https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=11a2a949d05e9d2d9823f0c45fa476743d9e462b
+* https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=1586342e428d80e53f9a926b2e238d2175b9f5b5
+* https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=be7fd3c3a8c5e9acbc69f887ca961df5e68cf6f0
+
+Along with backported patches from the media-tree that b-rad-NDi made available here:
+* https://github.com/b-rad-NDi/Ubuntu-media-tree-kernel-builder/tree/master/patches/fedora-22-4.4.0
 
 ## Preparation
 Using a Ubuntu 18.04 OS VM in order to build the updated modules.
@@ -42,52 +55,12 @@ Using a Ubuntu 18.04 OS VM in order to build the updated modules.
 Install a few essential packages:
 ```
 $ sudo apt update
-$ sudo apt install build-essential ncurses-dev bc libssl-dev libc6-i386 curl libproc-processtable-perl
+$ sudo apt install build-essential ncurses-dev bc libssl-dev libc6-i386 curl
 ```
 
-Clone b-rad-NDi git repository:
-```
-$ git clone https://github.com/b-rad-NDi/Embedded-MediaDrivers.git
-$ cd Embedded-MediaDrivers
-~/Embedded-MediaDrivers$
-```
+The toolchain & kernel sources are located here:
+https://sourceforge.net/projects/dsgpl/files/
 
-Create a `SYNO-Apollolake` download directory:
-```
-$ mkdir dl/SYNO-Apollolake
-```
-
-Download the toolchain
-* https://sourceforge.net/projects/dsgpl/files/DSM%206.2%20Tool%20Chains/
-```
-$ wget --content-disposition https://sourceforge.net/projects/dsgpl/files/DSM%206.2%20Tool%20Chains/Intel%20x86%20Linux%204.4.59%20%28Apollolake%29/apollolake-gcc493_glibc220_linaro_x86_64-GPL.txz/download -P dl/SYNO-Apollolake/
-```
-
-Download the Synology DSM kernel sources:
-* https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/
-```
-$ wget --content-disposition https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/apollolake-source/linux-4.4.x.txz/download -P dl/SYNO-Apollolake/
-```
-
-Initialize the repository:
-```
-$ ./md_builder.sh -i -d SYNO-Apollolake
-```
-
-Build a default Synology DSM kernel build (takes a while):
-```
-$ ./md_builder.sh -B media -d SYNO-Apollolake
-```
-
-Configure the media tree, get the latest media tree patches that applies over the default Synology DSM kernel and build the media drivers:
-```
-$ ./md_builder.sh -g -d SYNO-Apollolake
-$ cd build/SYNOAPOLLOLAKE/media_build
-build/SYNOAPOLLOLAKE/media_build$ ./build
-```
-
-
-BELOW NEEDS UPDATING...
 I use a $HOME/synology directory to drop all the downloaded files and a $HOME/source as my working directory.  Later references make usage of theses both paths:
 ```
 $ mkdir $HOME/synology
