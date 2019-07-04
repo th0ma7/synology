@@ -109,7 +109,7 @@ Copy the start/stop/load/reset script to the NAS (and make it executable):
 ```
 $ cd /usr/local/lib/modules/$(uname -r)
 $ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge.sh
-$ chmod 755 hauppauge-*.sh
+$ chmod 755 hauppauge.sh
 ```
 
 Create a local rc file locate at `/usr/local/etc/rc.d/media.sh` that will be executed at boot time:
@@ -192,3 +192,58 @@ $ lsusb -Ic
 Now reboot the NAS using the admin web page and confirm after reboot that the dmesg output and lsusb are still ok.
 
 In case you run into issue where your NAS refuses to fully shutdown (and thus reboot) with the power button led blinking, it is most probably due to tainted modules still in memory.  Running `hauppauge.sh stop` prior to shutdown/reboot will remove all the tainted modules from memory thus allowing the NAS to properly shutdown/reboot.
+
+---
+
+# hauppauge.sh
+This script is intended to provide a simple method to start|stop|restart the various perequesites into getting media modules loaded onto the Synology NAS.
+
+Basicaly what the script does:
+1. Load all the necessary modules
+2. Disable USB autosuspend over the Hauppauge USB ID
+3. Injects a few kernel `sysctl` for optmizations
+4. Starts TVH (service name `pkgctl-tvheadend`)
+
+## Modules
+The script uses `insmod` to load|unload the modules into the appropriate order.  The `MODULES` parameter in the script can be adapted to be used for other DVB than the Hauppauge WinTV 955D.
+
+|Order | Module               | `rmmod`           |
+|:----:|:--------------------:|:-----------------:|
+| 1    | media.ko             | media             |
+| 2    | videodev.ko          | videodev          |
+| 3    | videobuf2-common.ko  | videobuf2_common  |
+| 4    | videobuf2-v4l2.ko    | videobuf2_v4l2    |
+| 5    | videobuf2-memops.ko  | videobuf2_memops  |
+| 6    | videobuf2-vmalloc.ko | videobuf2_vmalloc |
+| 7    | dvb-core.ko          | dvb_core          |
+| 8    | rc-core.ko           | rc_core           |
+| 9    | dvb-usb.ko           | dvb_usb           |
+| 10   | v4l2-common.ko       | v4l2_common       |
+| 11   | tveeprom.ko          | tveeprom          |
+| 12   | si2157.ko            | si2157            |
+| 13   | lgdt3306a.ko         | lgdt3306a         |
+| 14   | em28xx.ko            | em28xx            |
+| 15   | em28xx-dvb.ko        | em28xx_dvb        |
+
+## Options
+**start:** Does a full start including:
+1. loading all the modules
+2. disabling USB autosuspend
+3. `sysctl` adjustments
+4. TVH startup
+
+**stop:** Does a stop which basicaly is:
+1. TVH shutdown
+2. Unloading all the modules
+
+**restart:** Basically performs a `stop` then `start`.
+
+**reset:** This is usefull when hitting BUGS with TVH such as OOM killer where the tvheadend service is being killed by the system.  The `reset` option does the following:
+1. TVH shutdown (forces it if needed)
+2. unload `em28xx_dvb`
+3. load of `em28xx-dvb.ko`
+4. TVH startup
+
+**load:** This is the option to be used at NAS startup.  It basically does all the same things as the `start` option without the TVH startup as it's being managed by the Synology DSM stack automatically.
+
+**status:** This provides a view on all things namely modules loaded into memory, USB autosuspend, `sysctl` adjustments and TVH service status including it's PID.
