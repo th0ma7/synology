@@ -4,8 +4,10 @@ Synology personnal hack, info, tools &amp; source code
 Donnations welcomed at: `0x522d164549E68681dfaC850A2cabdb95686C1fEC`
 
 # Hauppauge WinTV DualHD HWC 955D
-The following allows building kernel modules for the Hauppauge WinTV DualHD HWC 955D media adapter allowing to use TVheadend natively within the NAS.
+The following allows building kernel modules for the Hauppauge WinTV DualHD HWC 955D media adapter allowing to use TVheadEnd (TVH) natively within the NAS.
 * https://www.linuxtv.org/wiki/index.php/Hauppauge_WinTV-HVR-955Q
+In theory this procedure is also valid to build most supported DVB adaptors available from the Media Tree within the Linux Media Subsystem.
+* https://linuxtv.org/downloads/v4l-dvb-apis/dvb-drivers/cards.html
 
 Tested on the following hardware:
 * model: DS918+
@@ -28,9 +30,10 @@ model name	: Intel(R) Celeron(R) CPU J3455 @ 1.50GHz
 ```
 
 ## Current status
-I had backported patches to the Synology DSM 6.x 4.4 kernel but there where a few issues pending.  Since then b-rad-NDi ended-up providing a backporting tool that allows rebuilding the media tree over the Synology DSM 6.2 kernel.  This solution as been playing really nicely on my NAS over the last months.
+I had backported patches to the Synology DSM 6.x 4.4.59+ kernel but there where a few pending issues.  Since then b-rad-NDi ended-up providing a backporting tool that allows rebuilding the media tree over the Synology DSM kernel.  This solution as been playing really nicely on my NAS over the last months.  _Big thanks to b-rad-NDi!!!_
 
-For more details see: https://github.com/b-rad-NDi/Embedded-MediaDrivers
+For more details on b-rad-NDi project refer to:
+* https://github.com/b-rad-NDi/Embedded-MediaDrivers
 
 Working:
 - `em28xx`: both tuners detected & firmware loading OK
@@ -38,13 +41,11 @@ Working:
 End result:
 - `tvheadend`: fully detects both tuners
 
-Instead of building your own I've made available a pre-built module package for Hauppauge 955D for Synology NAS 6.2.2 kernel 4.4.59 with Apollolake CPU (e.g. DS918+):
-https://github.com/th0ma7/synology/raw/master/hauppauge/hauppauge955D-SYNOApollolake-DSM622_24922-Kernel_4.4.59-20190520.tar.bz2
+Instead of building your own I've made available a pre-built module package for Hauppauge 955D USB DVB dongle to work on Synology NAS 6.2.2 kernel 4.4.59+ with Apollolake CPU (e.g. DS918+):
+* https://github.com/th0ma7/synology/raw/master/hauppauge/hauppauge955D-SYNOApollolake-DSM622_24922-Kernel_4.4.59-20190520.tar.bz2
 
 ## Preparation
-Using a Ubuntu 18.04 OS VM in order to build the updated modules.
-
-Install a few essential packages:
+Using a Ubuntu 18.04 OS to build the updated modules install a few essential packages:
 ```
 $ sudo apt update
 $ sudo apt install build-essential ncurses-dev bc libssl-dev libc6-i386 curl libproc-processtable-perl
@@ -95,7 +96,7 @@ build/SYNOAPOLLOLAKE/media_build$ ./build
 
 Using SSH login as admin on the synology NAS:
 ```
-$ ssh admin@192.168.x.x
+$ ssh admin@<my.syno.nas.ip>
 ```
 
 Create a new local module directory (name will match kernel version):
@@ -104,7 +105,7 @@ $ sudo mkdir -p /usr/local/lib/modules/$(uname -r)
 $ cd /usr/local/lib/modules/$(uname -r)
 ```
 
-Download the updated media drivers modules over to the NAS:
+Download the updated media drivers modules over to the NAS (the following downloads not only the mandatory modules for Hauppauge WinTV but rather all the media tree modules):
 ```
 $ cd /usr/local/lib/modules/$(uname -r)
 $ sudo scp "username@192.168.x.x:~/Embedded-MediaDrivers/build/SYNOAPOLLOLAKE/media_build/v4l/*.ko" .
@@ -119,8 +120,11 @@ $ chmod 755 hauppauge.sh
 
 Create a local rc file locate at `/usr/local/etc/rc.d/media.sh` that will be executed at boot time:
 ```
+$ cat << EOF | sudo tee /usr/local/etc/rc.d/media.sh
 #!/bin/sh
 /usr/local/lib/modules/$(uname -r)/hauppauge.sh load
+EOF
+$ sudo chmod 755 /usr/local/etc/rc.d/media.sh
 ```
 
 Execute manually the rc script to confirm there is no error:
@@ -131,6 +135,29 @@ $ sudo /usr/local/etc/rc.d/media.sh
 Validate the status:
 ```
 $ sudo /usr/local/lib/modules/$(uname -r)/hauppauge.sh status
+Status pkgctl-tvheadend...            N/A
+kernel module status... 
+	em28xx_dvb                    OK
+	em28xx                        OK
+	lgdt3306a                     OK
+	si2157                        OK
+	tveeprom                      OK
+	v4l2_common                   OK
+	dvb_usb                       OK
+	rc_core                       OK
+	dvb_core                      OK
+	videobuf2_vmalloc             OK
+	videobuf2_memops              OK
+	videobuf2_v4l2                OK
+	videobuf2_common              OK
+	videodev                      OK
+	media                         OK
+kernel USB (1-3) autosuspend values...
+	(1-3)autosuspend_delay_ms     [-1000] -> OK
+	(1-3)autosuspend              [   -1] -> OK
+kernel sysctl values... 
+	vm.dirty_expire_centisecs     [  300] -> OK
+	vm.swappiness                 [    1] -> OK
 ```
 
 Normally should see something similar in kernel `dmesg`:
