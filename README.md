@@ -86,7 +86,7 @@ $ cd build/SYNOAPOLLOLAKE/media_build
 build/SYNOAPOLLOLAKE/media_build$ ./build
 ```
 
-# Installation
+## Installation
 
 Using SSH login as admin on the synology NAS:
 ```
@@ -115,13 +115,17 @@ $ chmod 755 hauppauge.sh
 Create a local rc file locate at `/usr/local/etc/rc.d/media.sh` that will be executed at boot time:
 ```
 #!/bin/sh
-
 /usr/local/lib/modules/$(uname -r)/hauppauge.sh load
 ```
 
-Execute manually the rc script to confirm all is ok:
+Execute manually the rc script to confirm there is no error:
 ```
-$ sudo /usr/local/etc/rc.d/media.sh load
+$ sudo /usr/local/etc/rc.d/media.sh
+```
+
+Validate the status:
+```
+$ sudo /usr/local/lib/modules/$(uname -r)/hauppauge.sh status
 ```
 
 Normally should see something similar in kernel `dmesg`:
@@ -205,7 +209,7 @@ Basicaly what the script does:
 4. Starts TVH (service name `pkgctl-tvheadend`)
 
 ## Modules
-The script uses `insmod` to load|unload the modules into the appropriate order.  The `MODULES` parameter in the script can be adapted to be used for other DVB than the Hauppauge WinTV 955D.
+The script uses `insmod` to load|unload the modules into the appropriate order.  The `MODULES` parameter in the script can be adapted as needed for other DVB dongles than the Hauppauge WinTV 955D.
 
 |Order | Module               | `rmmod`           |
 |:----:|:--------------------:|:-----------------:|
@@ -238,7 +242,7 @@ The script uses `insmod` to load|unload the modules into the appropriate order. 
 
 **restart:** Basically performs a `stop` then `start`.
 
-**reset:** This is usefull when hitting BUGS with TVH such as OOM killer where the tvheadend service is being killed by the system.  The `reset` option does the following:
+**reset:** This is usefull when hitting BUGS with TVH such as OOM killer where the tvheadend service is being killed by the system.  The `reset` option reduces to the minimal the impact over the already loaded modules by resetting only the DVB frontend module such as:
 1. TVH shutdown (forces it if needed)
 2. unload `em28xx_dvb`
 3. load of `em28xx-dvb.ko`
