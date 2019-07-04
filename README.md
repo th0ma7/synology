@@ -6,6 +6,7 @@ Donnations welcomed at: `0x522d164549E68681dfaC850A2cabdb95686C1fEC`
 # Hauppauge WinTV DualHD HWC 955D
 The following allows building kernel modules for the Hauppauge WinTV DualHD HWC 955D media adapter allowing to use TVheadEnd (TVH) natively within the NAS.
 * https://www.linuxtv.org/wiki/index.php/Hauppauge_WinTV-HVR-955Q
+
 In theory this procedure is also valid to build most supported DVB adaptors available from the Media Tree within the Linux Media Subsystem.
 * https://linuxtv.org/downloads/v4l-dvb-apis/dvb-drivers/cards.html
 
@@ -38,6 +39,7 @@ For more details on b-rad-NDi project refer to:
 Working:
 - `em28xx`: both tuners detected & firmware loading OK
 - `lgdt3306a`: fully functional
+
 End result:
 - `tvheadend`: fully detects both tuners
 
@@ -108,7 +110,7 @@ $ cd /usr/local/lib/modules/$(uname -r)
 Download the updated media drivers modules over to the NAS (the following downloads not only the mandatory modules for Hauppauge WinTV but rather all the media tree modules):
 ```
 $ cd /usr/local/lib/modules/$(uname -r)
-$ sudo scp "username@192.168.x.x:~/Embedded-MediaDrivers/build/SYNOAPOLLOLAKE/media_build/v4l/*.ko" .
+$ sudo scp "username@<my.ubuntu.linux.ip>:~/Embedded-MediaDrivers/build/SYNOAPOLLOLAKE/media_build/v4l/*.ko" .
 ```
 
 Copy the start/stop/load/reset script to the NAS (and make it executable):
@@ -243,23 +245,23 @@ Basicaly what the script does:
 ## Modules
 The script uses `insmod` to load|unload the modules into the appropriate order.  The `MODULES` parameter in the script can be adapted as needed for other DVB dongles than the Hauppauge WinTV 955D.
 
-|Order | Module               | `rmmod`           |
-|:----:|:--------------------:|:-----------------:|
-| 1    | media.ko             | media             |
-| 2    | videodev.ko          | videodev          |
-| 3    | videobuf2-common.ko  | videobuf2_common  |
-| 4    | videobuf2-v4l2.ko    | videobuf2_v4l2    |
-| 5    | videobuf2-memops.ko  | videobuf2_memops  |
-| 6    | videobuf2-vmalloc.ko | videobuf2_vmalloc |
-| 7    | dvb-core.ko          | dvb_core          |
-| 8    | rc-core.ko           | rc_core           |
-| 9    | dvb-usb.ko           | dvb_usb           |
-| 10   | v4l2-common.ko       | v4l2_common       |
-| 11   | tveeprom.ko          | tveeprom          |
-| 12   | si2157.ko            | si2157            |
-| 13   | lgdt3306a.ko         | lgdt3306a         |
-| 14   | em28xx.ko            | em28xx            |
-| 15   | em28xx-dvb.ko        | em28xx_dvb        |
+|Order | Module                 | `rmmod`             |
+|:----:|:----------------------:|:-------------------:|
+| 1    | `media.ko`             | `media`             |
+| 2    | `videodev.ko`          | `videodev`          |
+| 3    | `videobuf2-common.ko`  | `videobuf2_common`  |
+| 4    | `videobuf2-v4l2.ko`    | `videobuf2_v4l2`    |
+| 5    | `videobuf2-memops.ko`  | `videobuf2_memops`  |
+| 6    | `videobuf2-vmalloc.ko` | `videobuf2_vmalloc` |
+| 7    | `dvb-core.ko`          | `dvb_core`          |
+| 8    | `rc-core.ko`           | `rc_core`           |
+| 9    | `dvb-usb.ko`           | `dvb_usb`           |
+| 10   | `v4l2-common.ko`       | `v4l2_common`       |
+| 11   | `tveeprom.ko`          | `tveeprom`          |
+| 12   | `si2157.ko`            | `si2157`            |
+| 13   | `lgdt3306a.ko`         | `lgdt3306a`         |
+| 14   | `em28xx.ko`            | `em28xx`            |
+| 15   | `em28xx-dvb.ko`        | `em28xx_dvb`        |
 
 ## Options
 **start:** Does a full start including:
