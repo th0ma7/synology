@@ -30,11 +30,16 @@ model name	: Intel(R) Celeron(R) CPU J3455 @ 1.50GHz
 ## Current status
 I had backported patches to the Synology DSM 6.x 4.4 kernel but there where a few issues pending.  Since then b-rad-NDi ended-up providing a backporting tool that allows rebuilding the media tree over the Synology DSM 6.2 kernel.  This solution as been playing really nicely on my NAS over the last months.
 
+For more details see: https://github.com/b-rad-NDi/Embedded-MediaDrivers
+
 Working:
 - `em28xx`: both tuners detected & firmware loading OK
 - `lgdt3306a`: fully functional
 End result:
 - `tvheadend`: fully detects both tuners
+
+Instead of building your own I've made available a pre-built module package for Hauppauge 955D for Synology NAS 6.2.2 kernel 4.4.59 with Apollolake CPU (e.g. DS918+):
+https://github.com/th0ma7/synology/raw/master/hauppauge/hauppauge955D-SYNOApollolake-DSM622_24922-Kernel_4.4.59-20190520.tar.bz2
 
 ## Preparation
 Using a Ubuntu 18.04 OS VM in order to build the updated modules.
