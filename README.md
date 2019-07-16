@@ -141,7 +141,7 @@ $ sudo /usr/local/etc/rc.d/media.sh
 
 Validate the status:
 ```
-$ sudo /usr/local/lib/modules/$(uname -r)/hauppauge.sh status
+$ sudo /opt/bin/hauppauge.sh status
 Status pkgctl-tvheadend...            N/A
 kernel module status... 
 	em28xx_dvb                    OK
