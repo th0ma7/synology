@@ -120,6 +120,11 @@ $ wget https://raw.githubusercontent.com/th0ma7/synology/master/hauppauge.sh
 $ chmod 755 hauppauge.sh
 ```
 
+Create a symbolic link to `/opt/bin/hauppauge.sh` for ease of use:
+```
+$ sudo ln -s -T -f /usr/local/lib/modules/$(uname -r)/hauppauge.sh /opt/bin/hauppauge.sh
+```
+
 Create a local rc file locate at `/usr/local/etc/rc.d/media.sh` that will be executed at boot time:
 ```
 $ cat << EOF | sudo tee /usr/local/etc/rc.d/media.sh
