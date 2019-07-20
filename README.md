@@ -84,6 +84,7 @@ $ ./md_builder.sh -i -d SYNO-Apollolake
 
 Build a default Synology DSM kernel build (takes a while):
 ```
+$ export MAKEOPTS="-j`nproc`"
 $ ./md_builder.sh -B media -d SYNO-Apollolake
 ```
 
