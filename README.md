@@ -8,7 +8,8 @@ The following allows building kernel modules for the Hauppauge WinTV DualHD HWC 
 * https://www.linuxtv.org/wiki/index.php/Hauppauge_WinTV-HVR-955Q
 
 In theory this procedure is also valid to build most supported DVB adaptors available from the Media Tree within the Linux Media Subsystem.
-* https://linuxtv.org/downloads/v4l-dvb-apis/dvb-drivers/cards.html
+* https://linuxtv.org/wiki/index.php/ATSC_USB_devices
+* https://linuxtv.org/wiki/index.php/DVB-C_USB_Devices
 
 Tested on the following hardware:
 * model: DS918+
